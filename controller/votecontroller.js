@@ -24,12 +24,14 @@ function mul100(num) {
 
 // home page router
 router.get("/", function(req, res) {
-  if (!req.user) {
-        res.render("login")
-    }else{
-    var hbsObject;
-    res.render("index");
-  }
+  // if (!req.user) {
+  //       res.render("login")
+  //   }else{
+  //   var hbsObject;
+  //   res.render("index");
+  // };
+  // user auth no longer needed/wanted
+  res.render("index");
 });
 
 
