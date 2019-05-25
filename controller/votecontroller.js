@@ -24,12 +24,14 @@ function mul100(num) {
 
 // home page router
 router.get("/", function(req, res) {
-  if (!req.user) {
-        res.render("login")
-    }else{
-    var hbsObject;
-    res.render("index");
-  }
+  // if (!req.user) {
+  //       res.render("login")
+  //   }else{
+  //   var hbsObject;
+  //   res.render("index");
+  // };
+  // user auth no longer needed/wanted
+  res.render("index");
 });
 
 
@@ -160,7 +162,12 @@ router.get("/api/data/:code", function(req, res) {
     ];
     function scatter() {
       db.Washington_state_data.findAll({
-        attributes: ["county", "total_elig_pop", "total_turnout_pop_pct"]
+        attributes: ["county", "total_elig_pop", "total_turnout_pop_pct", "fips_code"],
+        where: {
+          fips_code: {
+            [Op.not]: "null"
+          }
+        }
       }).then(function(data) {
         var arr = [];
         for (var i = 0; i < data.length; i++) {
@@ -168,7 +175,8 @@ router.get("/api/data/:code", function(req, res) {
           var obj = {
             county: val.county,
             pop: val.total_elig_pop,
-            turnout: val.total_turnout_pop_pct
+            turnout: val.total_turnout_pop_pct,
+            code: val.fips_code
           };
           result.scatterData.push(obj);
         };

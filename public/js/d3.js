@@ -178,10 +178,9 @@ function barChart(data) {
     .attr("text-anchor", "start");
 };
 
-
 function scatterPlot(data) {
   var margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = 960 - margin.left - margin.right,
+    width = 500 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
   var x = d3.scaleLog().range([0, width]);
@@ -189,25 +188,49 @@ function scatterPlot(data) {
 
   var svg = d3.select(".scatter").append("svg")
     .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("height", height + margin.top + margin.bottom + 20)
   .append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
   x.domain(d3.extent(data, function(d) { return d.pop; }));
-  y.domain([0, d3.max(data, function(d) { return d.turnout; })]);
+  y.domain([0.4, d3.max(data, function(d) { return d.turnout; })]);
 
   svg.selectAll("dot")
        .data(data)
      .enter().append("circle")
        .attr("r", 5)
        .attr("cx", function(d) { return x(d.pop); })
-       .attr("cy", function(d) { return y(d.turnout); });
+       .attr("cy", function(d) { return y(d.turnout); })
+       .style("fill", function(d) {
+         if (d.code === $('#county-name').attr("data-fips")) {
+           return "red";
+         } else {
+           return "black";
+         };
+       })
+       .append("title")
+          .text(function(d) { return d.county + " County" + "\n" + "Pop: " + d.pop + "\n" + "Turnout: " + (d.turnout * 100).toFixed(2) + "%" });
 
   svg.append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
+    .call(d3.axisBottom(x).ticks(6, 0));
+
+  svg.append("text")
+    .attr("transform",
+          "translate(" + (width/2) + " ," +
+                         (height + margin.top + 20) + ")")
+    .style("text-anchor", "middle")
+    .text("Population of Eligible Voters (Log)");
 
   svg.append("g")
-    .call(d3.axisLeft(y));
+    .call(d3.axisLeft(y).ticks(null, "%"));
+
+  svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Turnout Percentage");
 };
